@@ -17,6 +17,7 @@ GUI Components:
 - Main application window with dropdowns for selecting items and construction sites, an entry field for quantity, and buttons for adding deliveries, exporting/importing data, managing construction sites, and clearing the database.
 - A table to display the delivery history.
 """
+
 # Import necessary libraries
 import sys
 import os
