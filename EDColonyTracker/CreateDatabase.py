@@ -1,6 +1,23 @@
+"""
+This script creates a SQLite database for tracking deliveries, items, and locations.
+It includes functions to create tables, add items and locations, and populate the items table.
+Functions:
+    create_tables():
+        Creates the necessary tables for deliveries, items, and locations if they do not exist.
+        Adds new columns to the deliveries table if they do not exist.
+    add_item(item_name: str):
+        Adds a new item to the items table if it does not already exist.
+        Args:
+            item_name (str): The name of the item to add.
+    add_location(location_name: str):
+        Adds a new location to the locations table if it does not already exist.
+        Args:
+            location_name (str): The name of the location to add.
+    populate_items():
+        Populates the items table with a predefined list of commodities.
+"""
+
 import sqlite3
-# This script creates a SQLite database for tracking deliveries, items, and locations.
-# It includes functions to create tables, add items and locations, and populate the items table.
 
 def create_tables():
     print("create_tables function called")
@@ -11,11 +28,21 @@ def create_tables():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS deliveries (
             id INTEGER PRIMARY KEY,
-            item TEXT,
+            commodity TEXT,
             quantity INTEGER,
-            location TEXT
+            location TEXT,
+            amount_required INTEGER,
+            UNIQUE(commodity, location)
         )
     ''')
+
+    # Add new columns if they don't exist
+    cursor.execute("PRAGMA table_info(deliveries)")
+    columns = [info[1] for info in cursor.fetchall()]
+    if 'commodity' not in columns:
+        cursor.execute("ALTER TABLE deliveries ADD COLUMN commodity TEXT")
+    if 'amount_required' not in columns:
+        cursor.execute("ALTER TABLE deliveries ADD COLUMN amount_required INTEGER")
 
     # Create table for items if it doesn't exist
     cursor.execute('''
