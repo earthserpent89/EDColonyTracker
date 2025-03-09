@@ -1,27 +1,27 @@
 """
-This script creates a SQLite database for tracking deliveries, items, and locations.
-It includes functions to create tables, add items and locations, and populate the items table.
+This script creates a SQLite database for tracking deliveries, items, and construction sites.
+It includes functions to create tables, add items and construction sites, and populate the items table.
 Functions:
     create_tables():
-        Creates the necessary tables for deliveries, items, and locations if they do not exist.
+        Creates the necessary tables for deliveries, items, and construction sites if they do not exist.
         Adds new columns to the deliveries table if they do not exist.
     add_item(item_name: str):
         Adds a new item to the items table if it does not already exist.
         Args:
             item_name (str): The name of the item to add.
-    add_location(location_name: str):
-        Adds a new location to the locations table if it does not already exist.
+    add_construction_site(construction_site_name: str):
+        Adds a new construction site to the construction sites table if it does not already exist.
         Args:
-            location_name (str): The name of the location to add.
+            construction_site_name (str): The name of the construction site to add.
     populate_items():
         Populates the items table with a predefined list of commodities.
 """
 
 import sqlite3
 
-def create_tables():
+def create_tables(db_name="cargo_tracker.db"):
     print("create_tables function called")
-    conn = sqlite3.connect("cargo_tracker.db")
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
     # Create table for deliveries if it doesn't exist
@@ -30,9 +30,9 @@ def create_tables():
             id INTEGER PRIMARY KEY,
             commodity TEXT,
             quantity INTEGER,
-            location TEXT,
+            construction_site TEXT,
             amount_required INTEGER,
-            UNIQUE(commodity, location)
+            UNIQUE(commodity, construction_site)
         )
     ''')
 
@@ -52,9 +52,9 @@ def create_tables():
         )
     ''')
 
-    # Create table for locations if it doesn't exist
+    # Create table for construction sites if it doesn't exist
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS locations (
+        CREATE TABLE IF NOT EXISTS construction_sites (
             id INTEGER PRIMARY KEY,
             name TEXT UNIQUE
         )
@@ -71,13 +71,16 @@ def add_item(item_name):
     conn.commit()
     conn.close()
 
-def add_location(location_name):
-    print(f"add_location function called with location_name: {location_name}")
+def add_construction_site(construction_site_name):
+    print(f"add_construction_site function called with construction_site_name: {construction_site_name}")
     conn = sqlite3.connect("cargo_tracker.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO locations (name) VALUES (?)", (location_name,))
+    cursor.execute("INSERT OR IGNORE INTO construction_sites (name) VALUES (?)", (construction_site_name,))
     conn.commit()
     conn.close()
+
+    # Create a separate database for the construction site
+    create_tables(f"{construction_site_name}.db")
 
 def populate_items():
     print("populate_items function called")
