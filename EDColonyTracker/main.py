@@ -76,8 +76,8 @@ def add_delivery():
     cursor = conn.cursor()
     cursor.execute("SELECT quantity FROM deliveries WHERE commodity = ? AND location = ?", (commodity, construction_site))
     result = cursor.fetchone()
-    if result:
-        new_quantity = result[0] + quantity
+    if result and result[0] is not None:
+        new_quantity = (result[0] if result[0] is not None else 0) + quantity
         cursor.execute("UPDATE deliveries SET quantity = ? WHERE commodity = ? AND location = ?", (new_quantity, commodity, construction_site))
     else:
         cursor.execute("INSERT INTO deliveries (commodity, quantity, location) VALUES (?, ?, ?)", (commodity, quantity, construction_site))
@@ -214,18 +214,23 @@ def clear_database():
 # Create the main application window
 root = tk.Tk()
 root.title("Elite Dangerous Cargo Tracker")
-root.geometry("600x400")
+root.geometry("800x400")
+root.minsize(800, 400)  # Set minimum window size
 
 # Frame for the top row of inputs
 top_frame = tk.Frame(root)
-top_frame.pack(pady=10)
+top_frame.pack(pady=10, fill=tk.X)
+
+# Centering frame for the top row of inputs
+top_center_frame = tk.Frame(top_frame)
+top_center_frame.pack(anchor=tk.CENTER)
 
 # Dropdown for selecting cargo item (dynamic)
-tk.Label(top_frame, text="Select Item:").grid(row=0, column=0, padx=5)
+tk.Label(top_center_frame, text="Select Item:").grid(row=0, column=0, padx=5, sticky=tk.W)
 item_var = tk.StringVar()
-item_dropdown = ttk.Combobox(top_frame, textvariable=item_var)
+item_dropdown = ttk.Combobox(top_center_frame, textvariable=item_var)
 item_dropdown['values'] = fetch_items()
-item_dropdown.grid(row=0, column=1, padx=5)
+item_dropdown.grid(row=0, column=1, padx=5, sticky=tk.EW)
 
 # Enable autocomplete for the item dropdown
 def on_item_entry(event):
@@ -242,41 +247,57 @@ def on_item_entry(event):
 item_dropdown.bind('<KeyRelease>', on_item_entry)
 
 # Dropdown for selecting construction site (dynamic)
-tk.Label(top_frame, text="Select Construction Site:").grid(row=0, column=2, padx=5)
+tk.Label(top_center_frame, text="Select Construction Site:").grid(row=0, column=2, padx=5, sticky=tk.W)
 construction_site_var = tk.StringVar()  # Define construction_site_var
-construction_site_dropdown = ttk.Combobox(top_frame, textvariable=construction_site_var)
+construction_site_dropdown = ttk.Combobox(top_center_frame, textvariable=construction_site_var)
 construction_site_dropdown['values'] = fetch_construction_sites()
-construction_site_dropdown.grid(row=0, column=3, padx=5)
+construction_site_dropdown.grid(row=0, column=3, padx=5, sticky=tk.EW)
 
 # Entry field for quantity
-tk.Label(top_frame, text="Enter Quantity:").grid(row=0, column=4, padx=5)
+tk.Label(top_center_frame, text="Enter Quantity:").grid(row=0, column=4, padx=5, sticky=tk.W)
 quantity_var = tk.StringVar()
-quantity_entry = tk.Entry(top_frame, textvariable=quantity_var)
-quantity_entry.grid(row=0, column=5, padx=5)
+quantity_entry = tk.Entry(top_center_frame, textvariable=quantity_var)
+quantity_entry.grid(row=0, column=5, padx=5, sticky=tk.EW)
 
 # Button to add delivery
-add_button = tk.Button(top_frame, text="Add Delivery", command=add_delivery)
-add_button.grid(row=0, column=6, padx=5)
+add_button = tk.Button(top_center_frame, text="Add Delivery", command=add_delivery, width=15)
+add_button.grid(row=0, column=6, padx=10, sticky=tk.EW)
+
+# Configure column weights for dynamic resizing
+top_center_frame.columnconfigure(1, weight=1)
+top_center_frame.columnconfigure(3, weight=1)
+top_center_frame.columnconfigure(5, weight=1)
+top_center_frame.columnconfigure(6, weight=1)
 
 # Frame for the bottom row of buttons
 bottom_frame = tk.Frame(root)
-bottom_frame.pack(pady=10)
+bottom_frame.pack(pady=10, fill=tk.X)
+
+# Centering frame for the bottom row of buttons
+bottom_center_frame = tk.Frame(bottom_frame)
+bottom_center_frame.pack(anchor=tk.CENTER)
 
 # Button to export deliveries to CSV
-export_button = tk.Button(bottom_frame, text="Export to CSV", command=export_to_csv)
-export_button.grid(row=0, column=1, padx=5)
+export_button = tk.Button(bottom_center_frame, text="Export to CSV", command=export_to_csv, width=15)
+export_button.grid(row=0, column=1, padx=5, sticky=tk.EW)
 
 # Button to import deliveries from CSV
-import_button = tk.Button(bottom_frame, text="Import from CSV", command=import_from_csv)
-import_button.grid(row=0, column=2, padx=5)
+import_button = tk.Button(bottom_center_frame, text="Import from CSV", command=import_from_csv, width=15)
+import_button.grid(row=0, column=2, padx=5, sticky=tk.EW)
 
 # Button to open the construction site manager
-edit_sites_button = tk.Button(bottom_frame, text="Edit Construction Sites", command=open_construction_site_manager)
-edit_sites_button.grid(row=0, column=0, padx=5)
+edit_sites_button = tk.Button(bottom_center_frame, text="Edit Construction Sites", command=open_construction_site_manager, width=15)
+edit_sites_button.grid(row=0, column=0, padx=5, sticky=tk.EW)
 
 # Button to clear the database
-clear_db_button = tk.Button(bottom_frame, text="Clear Deliveries", command=clear_database)
-clear_db_button.grid(row=0, column=3, padx=5)
+clear_db_button = tk.Button(bottom_center_frame, text="Clear Deliveries", command=clear_database, width=15)
+clear_db_button.grid(row=0, column=3, padx=5, sticky=tk.EW)
+
+# Configure column weights for dynamic resizing
+bottom_center_frame.columnconfigure(0, weight=1)
+bottom_center_frame.columnconfigure(1, weight=1)
+bottom_center_frame.columnconfigure(2, weight=1)
+bottom_center_frame.columnconfigure(3, weight=1)
 
 # Table to display deliveries
 tk.Label(root, text="Delivery History:").pack()
