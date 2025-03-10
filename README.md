@@ -101,7 +101,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Elite Dangerous by Frontier Developments
-- The Elite Dangerous commander community
+- [EDCD: Community Developers Discord](https://discord.gg/zQjjutY)
+- Claude 3.7 Sonnet and ChatGPT 4o AI models for code development assistance
 
 ---
 
