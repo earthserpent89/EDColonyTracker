@@ -1,0 +1,85 @@
+2025-03-09 18:51:20 - Database - INFO - Database tables created/verified in cargo_tracker.db
+2025-03-09 18:51:20 - Database - INFO - Populated items table with 50 commodities
+2025-03-09 18:51:20 - Database - INFO - Database successfully initialized
+2025-03-09 18:52:55 - Database - INFO - Added construction site: Satellite C
+2025-03-09 18:52:55 - Database - INFO - Database tables created/verified in Satellite C.db
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 115 units of Agri-Medicines for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 4298 units of Aluminium for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 176 units of Bioreducing Lichen for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 732 units of Biowaste for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 3994 units of CMM Composites for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 725 units of Ceramic Composites for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 54 units of Computer Components for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 400 units of Copper for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 515 units of Crop Harvesters for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 165 units of Emergency Power Cells for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 27 units of Evacuation Shelter for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 294 units of Food Cartridges for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 146 units of Fruit & Veg for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 26 units of Geological Equipment for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 91 units of Grain for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 13 units of H.E. Suits for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 737 units of Insulating Membranes for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 1967 units of Land Enrichment Systems for Satellite C
+2025-03-09 18:53:37 - Database - INFO - Added new requirement: 3201 units of Liquid Oxygen for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 13 units of Medical Diag. Equip. for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 14 units of Micro Controllers for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 43 units of Muon Imager for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 13 units of Non-Lethal Weapon for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 371 units of Pesticides for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 1290 units of Polymers for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 45 units of Power Generators for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 22 units of Resonating Separators for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 59 units of Robotics for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 89 units of Semiconductors for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 8216 units of Steel for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 117 units of Structural Regulators for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 157 units of Superconductors for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 116 units of Surface Stabilisers for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 28 units of Survival Equipment for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 9591 units of Titanium for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 858 units of Water for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Added new requirement: 102 units of Water Purifiers for Satellite C
+2025-03-09 18:53:38 - Database - INFO - Updated 37 commodity requirements for Satellite C
+2025-03-09 18:57:31 - Database - INFO - Database tables created/verified in cargo_tracker.db
+2025-03-09 18:57:31 - Database - INFO - Populated items table with 50 commodities
+2025-03-09 18:57:31 - Database - INFO - Database successfully initialized
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 115 units of Agri-Medicines for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 4298 units of Aluminium for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 176 units of Bioreducing Lichen for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 732 units of Biowaste for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 3994 units of CMM Composites for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 725 units of Ceramic Composites for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 54 units of Computer Components for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 515 units of Crop Harvesters for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 165 units of Emergency Power Cells for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 27 units of Evacuation Shelter for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 26 units of Geological Equipment for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 91 units of Grain for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 13 units of H.E. Suits for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 737 units of Insulating Membranes for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 1967 units of Land Enrichment Systems for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 3201 units of Liquid Oxygen for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 13 units of Medical Diag. Equip. for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 14 units of Micro Controllers for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 43 units of Muon Imager for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 13 units of Non-Lethal Weapon for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 371 units of Pesticides for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 1290 units of Polymers for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 45 units of Power Generators for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 22 units of Resonating Separators for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 59 units of Robotics for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 89 units of Semiconductors for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 8216 units of Steel for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 117 units of Structural Regulators for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 157 units of Superconductors for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 116 units of Surface Stabilisers for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 28 units of Survival Equipment for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 9591 units of Titanium for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 858 units of Water for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated requirement: 102 units of Water Purifiers for Satellite C
+2025-03-09 18:57:59 - Database - INFO - Updated 34 commodity requirements for Satellite C
+2025-03-09 18:58:23 - Database - INFO - Removed construction site: Settlement B
+2025-03-09 18:58:23 - Database - ERROR - File error in remove_construction_site: [WinError 32] The process cannot access the file because it is being used by another process: 'g:\\My Drive\\Projects\\Git Home\\EDColonyTracker\\EDColonyTracker\\databases\\Settlement B.db'
+2025-03-09 18:59:28 - Database - INFO - Removed construction site: Orbital A
+2025-03-09 18:59:28 - Database - ERROR - File error in remove_construction_site: [WinError 32] The process cannot access the file because it is being used by another process: 'g:\\My Drive\\Projects\\Git Home\\EDColonyTracker\\EDColonyTracker\\databases\\Orbital A.db'

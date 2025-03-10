@@ -208,6 +208,7 @@ def add_delivery(construction_site, commodity, quantity):
 
 def remove_construction_site(construction_site):
     """Remove a construction site from the database."""
+    # First remove from the main database
     try:
         db_path = get_db_path("cargo_tracker.db")
         with sqlite3.connect(db_path) as conn:
@@ -215,16 +216,30 @@ def remove_construction_site(construction_site):
             cursor.execute("DELETE FROM construction_sites WHERE name = ?", (construction_site,))
             if cursor.rowcount > 0:
                 logger.info(f"Removed construction site: {construction_site}")
-        
-        # Remove the construction site database file
-        site_db_path = get_db_path(f"{construction_site}.db")
-        if os.path.exists(site_db_path):
-            os.remove(site_db_path)
-            logger.info(f"Removed database file for {construction_site}")
     except sqlite3.Error as e:
         logger.error(f"Database error in remove_construction_site: {e}")
-    except OSError as e:
-        logger.error(f"File error in remove_construction_site: {e}")
+        return False
+        
+    # Then try to remove the file
+    site_db_path = get_db_path(f"{construction_site}.db")
+    if os.path.exists(site_db_path):
+        try:
+            # Try to close any connections to the file
+            import gc
+            gc.collect()  # Force garbage collection to release file handles
+            
+            # Try to delete the file
+            os.remove(site_db_path)
+            logger.info(f"Removed database file for {construction_site}")
+            return True
+        except OSError as e:
+            # If deletion fails, log it but don't fail the operation
+            logger.warning(f"Could not remove database file for {construction_site}: {e}")
+            logger.warning("The file may be in use by another application and will need to be removed manually.")
+            
+            # Return True anyway since the site was removed from the main database
+            return True
+    return True
 
 def clear_deliveries(construction_site):
     """Clear all deliveries for a specific construction site."""

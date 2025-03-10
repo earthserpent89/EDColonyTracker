@@ -164,9 +164,21 @@ def open_construction_site_manager(parent, update_callback=None):
         except ValueError:
             messagebox.showerror("Invalid Input", "Please enter a positive number for the amount")
             return
-            
-        # Add the commodity to the treeview
-        requirements_tree.insert("", tk.END, values=(commodity, amount))
+        
+        # Check if the commodity already exists in the treeview
+        existing_item_id = None
+        for item_id in requirements_tree.get_children():
+            item = requirements_tree.item(item_id)
+            if item['values'][0] == commodity:
+                existing_item_id = item_id
+                break
+        
+        if existing_item_id:
+            # Update existing item
+            requirements_tree.item(existing_item_id, values=(commodity, amount))
+        else:
+            # Add new item
+            requirements_tree.insert("", tk.END, values=(commodity, amount))
         
         # Clear the entry fields
         commodity_var.set("")
