@@ -1,7 +1,13 @@
 # edcolonytracker.spec
 import os
+import shutil
 from PyInstaller.building.api import PYZ, EXE, COLLECT
 from PyInstaller.building.build_main import Analysis
+
+# Clean up any existing build directories
+for directory in ['build', 'dist']:
+    if os.path.exists(directory):
+        shutil.rmtree(directory)
 
 block_cipher = None
 
@@ -9,9 +15,7 @@ a = Analysis(
     ['EDColonyTrackerPackage/main.py'],  # Updated path to main script
     pathex=[os.path.abspath('.')],
     binaries=[],
-    datas=[
-        ('EDColonyTrackerPackage/resources', 'resources'),  # Updated path to resources
-    ],
+    datas=[],  # Empty for now
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],
@@ -31,10 +35,8 @@ pyz = PYZ(
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    [],
+    [],  # Empty instead of a.binaries, a.zipfiles, a.datas
+    exclude_binaries=True,  # This is critical
     name='EDColonyTracker',
     debug=False,
     bootloader_ignore_signals=False,
@@ -42,6 +44,18 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # Set to False for a GUI application without console
-    icon='EDColonyTracker/resources/icon.ico'  # Application icon
+    console=True,  # Set to True for debugging
+    # No icon for now
+)
+
+# Add this to collect the binaries separately
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='EDColonyTracker'
 )

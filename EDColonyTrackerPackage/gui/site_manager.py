@@ -12,8 +12,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from database import (fetch_construction_sites, add_construction_site, 
                      remove_construction_site, fetch_items, fetch_deliveries,
-                     add_commodity_requirement, update_commodity_requirements,
-                     remove_commodity_requirement)
+                     update_commodity_requirements)
 from utils import get_logger
 
 # Get a logger for this module
