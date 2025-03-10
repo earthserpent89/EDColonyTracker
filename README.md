@@ -76,6 +76,7 @@ Titanium,4500,Maclaurin Reach
 Computer Components,1800,Maclaurin Reach
 Copper,2500,Fort Bradley
 Emergency Power Cells,800,Fort Bradley
+```
 
 ## Project Structure
 
