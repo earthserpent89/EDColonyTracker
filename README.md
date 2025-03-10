@@ -2,7 +2,7 @@
 
 A cargo tracking application for Elite Dangerous colony construction projects. This tool helps commanders manage deliveries to construction sites by tracking commodity requirements and completed shipments.
 
-![Elite Dangerous Colony Tracker](https://i.imgur.com/placeholder.png)
+![Elite Dangerous Colony Tracker](./images/PreviewExample.png)
 
 ## Features
 
