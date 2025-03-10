@@ -426,3 +426,19 @@
 2025-03-09 19:39:59 - Database - INFO - Updated requirement: 858 units of Water for Settlement B
 2025-03-09 19:39:59 - Database - INFO - Updated requirement: 102 units of Water Purifiers for Settlement B
 2025-03-09 19:39:59 - Database - INFO - Updated 37 commodity requirements for Settlement B
+2025-03-09 23:37:05 - Main - INFO - Starting EDColonyTracker application
+2025-03-09 23:37:06 - Database - INFO - Database tables created/verified in cargo_tracker.db
+2025-03-09 23:37:18 - Database - INFO - Populated items table with 50 commodities
+2025-03-09 23:37:18 - Database - INFO - Database successfully initialized
+2025-03-09 23:37:18 - Main - WARNING - Could not load application icon: bitmap "resources/icon.ico" not defined
+2025-03-09 23:37:18 - MainWindow - INFO - Initializing main application window
+2025-03-09 23:37:18 - Main - INFO - No existing construction sites found
+2025-03-09 23:37:18 - Main - INFO - Application initialized, starting main loop
+2025-03-09 23:37:36 - Main - INFO - Starting EDColonyTracker application
+2025-03-09 23:37:36 - Database - INFO - Database tables created/verified in cargo_tracker.db
+2025-03-09 23:37:36 - Database - INFO - Populated items table with 50 commodities
+2025-03-09 23:37:36 - Database - INFO - Database successfully initialized
+2025-03-09 23:37:36 - Main - WARNING - Could not load application icon: bitmap "resources/icon.ico" not defined
+2025-03-09 23:37:36 - MainWindow - INFO - Initializing main application window
+2025-03-09 23:37:36 - Main - INFO - No existing construction sites found
+2025-03-09 23:37:36 - Main - INFO - Application initialized, starting main loop
