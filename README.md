@@ -65,15 +65,16 @@ A cargo tracking application for Elite Dangerous colony construction projects. T
 
 ```
 EDColonyTracker/
-├── EDColonyTracker/
-│   ├── databases/     # Database files
-│   ├── gui/
-│   │   ├── __init__.py
-│   │   ├── main_window.py
-│   │   ├── delivery_ui.py
-│   │   └── site_manager.py
-│   ├── database.py    # Database operations
-│   └── main.py        # Application entry point
+├── databases/         # Database files
+├── gui/
+│   ├── __init__.py
+│   ├── main_window.py
+│   ├── delivery_ui.py
+│   └── site_manager.py
+├── images/            # Screenshots and UI previews
+│   └── PreviewExample.png
+├── database.py        # Database operations
+├── main.py            # Application entry point
 └── README.md
 ```
 
