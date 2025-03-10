@@ -4,8 +4,6 @@ Elite Dangerous Cargo Tracker - Main Application Entry Point
 This application tracks cargo deliveries for construction sites in Elite Dangerous.
 """
 
-import sys
-import os
 import tkinter as tk
 from database import initialize_database, fetch_construction_sites
 from gui import MainWindow

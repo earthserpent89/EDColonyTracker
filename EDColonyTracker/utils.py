@@ -3,8 +3,6 @@ Utility functions for Elite Dangerous Cargo Tracker.
 """
 
 import os
-import sys
-import csv
 import logging
 
 # Configure logging

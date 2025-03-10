@@ -6,9 +6,25 @@ items, and construction sites.
 import sqlite3
 import os
 
+# Define the database directory path
+DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "databases")
+
+def ensure_db_directory_exists():
+    """Ensure the database directory exists, creating it if necessary."""
+    if not os.path.exists(DB_DIR):
+        os.makedirs(DB_DIR)
+        print(f"Created database directory: {DB_DIR}")
+
+def get_db_path(db_name):
+    """Get the full path for a database file and ensure the directory exists."""
+    ensure_db_directory_exists()
+    return os.path.join(DB_DIR, db_name)
+
 def create_tables(db_name="cargo_tracker.db"):
+    """Create necessary database tables if they don't exist."""
     print("create_tables function called")
-    conn = sqlite3.connect(db_name)
+    db_path = get_db_path(db_name)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Create table for deliveries if it doesn't exist
@@ -52,7 +68,8 @@ def create_tables(db_name="cargo_tracker.db"):
 
 def add_item(item_name):
     """Add a new item to the items table."""
-    conn = sqlite3.connect("cargo_tracker.db")
+    db_path = get_db_path("cargo_tracker.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO items (name) VALUES (?)", (item_name,))
     conn.commit()
@@ -60,7 +77,8 @@ def add_item(item_name):
 
 def add_construction_site(construction_site_name):
     """Add a new construction site to the construction sites table."""
-    conn = sqlite3.connect("cargo_tracker.db")
+    db_path = get_db_path("cargo_tracker.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO construction_sites (name) VALUES (?)", (construction_site_name,))
     conn.commit()
@@ -94,7 +112,8 @@ def initialize_database():
 
 def fetch_items():
     """Fetch all items from the database."""
-    conn = sqlite3.connect("cargo_tracker.db")
+    db_path = get_db_path("cargo_tracker.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM items")
     items = [row[0] for row in cursor.fetchall()]
@@ -103,7 +122,8 @@ def fetch_items():
 
 def fetch_construction_sites():
     """Fetch all construction sites from the database."""
-    conn = sqlite3.connect("cargo_tracker.db")
+    db_path = get_db_path("cargo_tracker.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM construction_sites")
     construction_sites = [row[0] for row in cursor.fetchall()]
@@ -112,7 +132,8 @@ def fetch_construction_sites():
 
 def fetch_deliveries(construction_site):
     """Fetch deliveries for a specific construction site."""
-    conn = sqlite3.connect(f"{construction_site}.db")
+    db_path = get_db_path(f"{construction_site}.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT commodity, amount_required, SUM(quantity) FROM deliveries GROUP BY commodity")
     rows = cursor.fetchall()
@@ -128,7 +149,8 @@ def fetch_deliveries(construction_site):
 
 def add_delivery(construction_site, commodity, quantity):
     """Add a delivery to the database for a specific construction site."""
-    conn = sqlite3.connect(f"{construction_site}.db")
+    db_path = get_db_path(f"{construction_site}.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT quantity FROM deliveries WHERE commodity = ?", (commodity,))
     result = cursor.fetchone()
@@ -143,19 +165,22 @@ def add_delivery(construction_site, commodity, quantity):
 
 def remove_construction_site(construction_site):
     """Remove a construction site from the database."""
-    conn = sqlite3.connect("cargo_tracker.db")
+    db_path = get_db_path("cargo_tracker.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM construction_sites WHERE name = ?", (construction_site,))
     conn.commit()
     conn.close()
     
     # Remove the construction site database file
-    if os.path.exists(f"{construction_site}.db"):
-        os.remove(f"{construction_site}.db")
+    site_db_path = get_db_path(f"{construction_site}.db")
+    if os.path.exists(site_db_path):
+        os.remove(site_db_path)
 
 def clear_deliveries(construction_site):
     """Clear all deliveries for a specific construction site."""
-    conn = sqlite3.connect(f"{construction_site}.db")
+    db_path = get_db_path(f"{construction_site}.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM deliveries")
     conn.commit()
@@ -177,7 +202,8 @@ def import_from_csv_to_db(csv_data):
         add_construction_site(construction_site)
         
         # Add delivery data
-        conn = sqlite3.connect(f"{construction_site}.db")
+        db_path = get_db_path(f"{construction_site}.db")
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT amount_required FROM deliveries WHERE commodity = ?", (commodity,))
         result = cursor.fetchone()
