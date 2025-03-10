@@ -5,15 +5,26 @@ items, and construction sites.
 
 import sqlite3
 import os
+import logging
 
 # Define the database directory path
 DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "databases")
+
+# Set up logging
+log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "edcolonytracker.log")
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger('Database')
 
 def ensure_db_directory_exists():
     """Ensure the database directory exists, creating it if necessary."""
     if not os.path.exists(DB_DIR):
         os.makedirs(DB_DIR)
-        print(f"Created database directory: {DB_DIR}")
+        logger.info(f"Created database directory: {DB_DIR}")
 
 def get_db_path(db_name):
     """Get the full path for a database file and ensure the directory exists."""
@@ -22,7 +33,7 @@ def get_db_path(db_name):
 
 def create_tables(db_name="cargo_tracker.db"):
     """Create necessary database tables if they don't exist."""
-    print("create_tables function called")
+    logger.debug("create_tables function called")
     db_path = get_db_path(db_name)
     try:
         with sqlite3.connect(db_path) as conn:
@@ -45,8 +56,10 @@ def create_tables(db_name="cargo_tracker.db"):
             columns = [info[1] for info in cursor.fetchall()]
             if 'commodity' not in columns:
                 cursor.execute("ALTER TABLE deliveries ADD COLUMN commodity TEXT")
+                logger.info(f"Added commodity column to {db_name}")
             if 'amount_required' not in columns:
                 cursor.execute("ALTER TABLE deliveries ADD COLUMN amount_required INTEGER")
+                logger.info(f"Added amount_required column to {db_name}")
 
             # Create table for items if it doesn't exist
             cursor.execute('''
@@ -63,8 +76,9 @@ def create_tables(db_name="cargo_tracker.db"):
                     name TEXT UNIQUE
                 )
             ''')
+            logger.info(f"Database tables created/verified in {db_name}")
     except sqlite3.Error as e:
-        print(f"Database error in create_tables: {e}")
+        logger.error(f"Database error in create_tables: {e}")
 
 def add_item(item_name):
     """Add a new item to the items table."""
@@ -73,8 +87,10 @@ def add_item(item_name):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT OR IGNORE INTO items (name) VALUES (?)", (item_name,))
+            if cursor.rowcount > 0:
+                logger.debug(f"Added item: {item_name}")
     except sqlite3.Error as e:
-        print(f"Database error in add_item: {e}")
+        logger.error(f"Database error in add_item: {e}")
 
 def add_construction_site(construction_site_name):
     """Add a new construction site to the construction sites table."""
@@ -83,11 +99,13 @@ def add_construction_site(construction_site_name):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT OR IGNORE INTO construction_sites (name) VALUES (?)", (construction_site_name,))
+            if cursor.rowcount > 0:
+                logger.info(f"Added construction site: {construction_site_name}")
         
         # Create a separate database for the construction site
         create_tables(f"{construction_site_name}.db")
     except sqlite3.Error as e:
-        print(f"Database error in add_construction_site: {e}")
+        logger.error(f"Database error in add_construction_site: {e}")
 
 def populate_items():
     """Populate the items table with a predefined list of commodities."""
@@ -107,16 +125,18 @@ def populate_items():
 
         for commodity in commodities:
             add_item(commodity)
+        logger.info(f"Populated items table with {len(commodities)} commodities")
     except Exception as e:
-        print(f"Error in populate_items: {e}")
+        logger.error(f"Error in populate_items: {e}")
 
 def initialize_database():
     """Initialize the database tables and populate items."""
     try:
         create_tables()
         populate_items()
+        logger.info("Database successfully initialized")
     except Exception as e:
-        print(f"Error initializing database: {e}")
+        logger.error(f"Error initializing database: {e}")
 
 def fetch_items():
     """Fetch all items from the database."""
@@ -127,8 +147,9 @@ def fetch_items():
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM items")
             items = [row[0] for row in cursor.fetchall()]
+        logger.debug(f"Fetched {len(items)} items from database")
     except sqlite3.Error as e:
-        print(f"Database error in fetch_items: {e}")
+        logger.error(f"Database error in fetch_items: {e}")
     return items
 
 def fetch_construction_sites():
@@ -140,8 +161,9 @@ def fetch_construction_sites():
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM construction_sites")
             construction_sites = [row[0] for row in cursor.fetchall()]
+        logger.debug(f"Fetched {len(construction_sites)} construction sites from database")
     except sqlite3.Error as e:
-        print(f"Database error in fetch_construction_sites: {e}")
+        logger.error(f"Database error in fetch_construction_sites: {e}")
     return construction_sites
 
 def fetch_deliveries(construction_site):
@@ -160,8 +182,9 @@ def fetch_deliveries(construction_site):
                 total_delivered = total_delivered if total_delivered is not None else 0
                 remaining_amount = amount_required - total_delivered
                 deliveries.append((commodity, amount_required, remaining_amount, total_delivered))
+        logger.debug(f"Fetched {len(deliveries)} deliveries for {construction_site}")
     except sqlite3.Error as e:
-        print(f"Database error in fetch_deliveries: {e}")
+        logger.error(f"Database error in fetch_deliveries: {e}")
     return deliveries
 
 def add_delivery(construction_site, commodity, quantity):
@@ -175,11 +198,13 @@ def add_delivery(construction_site, commodity, quantity):
             if result:
                 new_quantity = (result[0] if result[0] is not None else 0) + quantity
                 cursor.execute("UPDATE deliveries SET quantity = ? WHERE commodity = ?", (new_quantity, commodity))
+                logger.info(f"Updated delivery: {quantity} units of {commodity} to {construction_site}, new total: {new_quantity}")
             else:
                 cursor.execute("INSERT INTO deliveries (commodity, quantity, construction_site) VALUES (?, ?, ?)", 
                               (commodity, quantity, construction_site))
+                logger.info(f"Added new delivery: {quantity} units of {commodity} to {construction_site}")
     except sqlite3.Error as e:
-        print(f"Database error in add_delivery: {e}")
+        logger.error(f"Database error in add_delivery: {e}")
 
 def remove_construction_site(construction_site):
     """Remove a construction site from the database."""
@@ -188,15 +213,18 @@ def remove_construction_site(construction_site):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM construction_sites WHERE name = ?", (construction_site,))
+            if cursor.rowcount > 0:
+                logger.info(f"Removed construction site: {construction_site}")
         
         # Remove the construction site database file
         site_db_path = get_db_path(f"{construction_site}.db")
         if os.path.exists(site_db_path):
             os.remove(site_db_path)
+            logger.info(f"Removed database file for {construction_site}")
     except sqlite3.Error as e:
-        print(f"Database error in remove_construction_site: {e}")
+        logger.error(f"Database error in remove_construction_site: {e}")
     except OSError as e:
-        print(f"File error in remove_construction_site: {e}")
+        logger.error(f"File error in remove_construction_site: {e}")
 
 def clear_deliveries(construction_site):
     """Clear all deliveries for a specific construction site."""
@@ -205,26 +233,34 @@ def clear_deliveries(construction_site):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM deliveries")
+            logger.info(f"Cleared all deliveries for {construction_site}")
     except sqlite3.Error as e:
-        print(f"Database error in clear_deliveries: {e}")
+        logger.error(f"Database error in clear_deliveries: {e}")
 
 def import_from_csv_to_db(csv_data):
     """Import data from CSV into the database."""
-    for delivery in csv_data:
-        if len(delivery) < 3:
-            continue
-        
-        commodity, amount_required, construction_site = delivery[:3]
-        if not commodity or not construction_site:
-            continue
+    imported_count = 0
+    try:
+        for delivery in csv_data:
+            if len(delivery) < 3:
+                continue
             
-        amount_required = int(amount_required) if amount_required and amount_required.isdigit() else 0
+            commodity, amount_required, construction_site = delivery[:3]
+            if not commodity or not construction_site:
+                continue
+                
+            amount_required = int(amount_required) if amount_required and amount_required.isdigit() else 0
 
-        # Add construction site
-        add_construction_site(construction_site)
+            # Add construction site
+            add_construction_site(construction_site)
+            
+            # Use the dedicated function to add the commodity requirement
+            add_commodity_requirement(construction_site, commodity, amount_required)
+            imported_count += 1
         
-        # Use the dedicated function to add the commodity requirement
-        add_commodity_requirement(construction_site, commodity, amount_required)
+        logger.info(f"Successfully imported {imported_count} records from CSV")
+    except Exception as e:
+        logger.error(f"Error during CSV import: {e}")
 
 def add_commodity_requirement(construction_site, commodity, amount_required):
     """Add a commodity requirement to a construction site."""
@@ -241,17 +277,23 @@ def add_commodity_requirement(construction_site, commodity, amount_required):
                 # Update existing record
                 cursor.execute("UPDATE deliveries SET amount_required = ? WHERE commodity = ?", 
                              (amount_required, commodity))
+                logger.info(f"Updated requirement: {amount_required} units of {commodity} for {construction_site}")
             else:
                 # Create new record
                 cursor.execute("INSERT INTO deliveries (commodity, quantity, construction_site, amount_required) VALUES (?, 0, ?, ?)", 
                               (commodity, construction_site, amount_required))
+                logger.info(f"Added new requirement: {amount_required} units of {commodity} for {construction_site}")
     except sqlite3.Error as e:
-        print(f"Database error in add_commodity_requirement: {e}")
+        logger.error(f"Database error in add_commodity_requirement: {e}")
 
 def update_commodity_requirements(construction_site, requirements_list):
     """Update all commodity requirements for a construction site."""
-    for commodity, amount in requirements_list:
-        add_commodity_requirement(construction_site, commodity, amount)
+    try:
+        for commodity, amount in requirements_list:
+            add_commodity_requirement(construction_site, commodity, amount)
+        logger.info(f"Updated {len(requirements_list)} commodity requirements for {construction_site}")
+    except Exception as e:
+        logger.error(f"Error in update_commodity_requirements: {e}")
 
 def remove_commodity_requirement(construction_site, commodity):
     """Remove a commodity requirement from a construction site."""
@@ -260,5 +302,7 @@ def remove_commodity_requirement(construction_site, commodity):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM deliveries WHERE commodity = ?", (commodity,))
+            if cursor.rowcount > 0:
+                logger.info(f"Removed requirement for {commodity} from {construction_site}")
     except sqlite3.Error as e:
-        print(f"Database error in remove_commodity_requirement: {e}")
+        logger.error(f"Database error in remove_commodity_requirement: {e}")
