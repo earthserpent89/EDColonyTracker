@@ -61,6 +61,22 @@ A cargo tracking application for Elite Dangerous colony construction projects. T
 - **Import**: Load data from a CSV file using the "Import from CSV" button
 - **Clear**: Remove all delivery records for a site with the "Clear Deliveries" button
 
+### CSV Import Format
+
+When importing data from CSV files, use the following structure:
+
+- The CSV file should contain three columns: Commodity, Amount Required, and Construction Site
+- The first row should be a header row with these column names
+- Each subsequent row represents one commodity requirement for a specific construction site
+
+Example CSV format:
+```csv
+Commodity,Amount Required,Construction Site
+Titanium,4500,Maclaurin Reach
+Computer Components,1800,Maclaurin Reach
+Copper,2500,Fort Bradley
+Emergency Power Cells,800,Fort Bradley
+
 ## Project Structure
 
 ```
