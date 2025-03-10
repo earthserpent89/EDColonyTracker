@@ -201,18 +201,41 @@ def import_from_csv_to_db(csv_data):
         # Add construction site
         add_construction_site(construction_site)
         
-        # Add delivery data
-        db_path = get_db_path(f"{construction_site}.db")
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT amount_required FROM deliveries WHERE commodity = ?", (commodity,))
-        result = cursor.fetchone()
-        
-        if result:
-            cursor.execute("UPDATE deliveries SET amount_required = ? WHERE commodity = ?", 
-                          (amount_required, commodity))
-        else:
-            cursor.execute("INSERT INTO deliveries (commodity, quantity, construction_site, amount_required) VALUES (?, 0, ?, ?)", 
-                          (commodity, construction_site, amount_required))
-        conn.commit()
-        conn.close()
+        # Use the dedicated function to add the commodity requirement
+        add_commodity_requirement(construction_site, commodity, amount_required)
+
+def add_commodity_requirement(construction_site, commodity, amount_required):
+    """Add a commodity requirement to a construction site."""
+    db_path = get_db_path(f"{construction_site}.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Check if the commodity already exists
+    cursor.execute("SELECT id FROM deliveries WHERE commodity = ?", (commodity,))
+    result = cursor.fetchone()
+    
+    if result:
+        # Update existing record
+        cursor.execute("UPDATE deliveries SET amount_required = ? WHERE commodity = ?", 
+                     (amount_required, commodity))
+    else:
+        # Create new record
+        cursor.execute("INSERT INTO deliveries (commodity, quantity, construction_site, amount_required) VALUES (?, 0, ?, ?)", 
+                      (commodity, construction_site, amount_required))
+    
+    conn.commit()
+    conn.close()
+
+def update_commodity_requirements(construction_site, requirements_list):
+    """Update all commodity requirements for a construction site."""
+    for commodity, amount in requirements_list:
+        add_commodity_requirement(construction_site, commodity, amount)
+
+def remove_commodity_requirement(construction_site, commodity):
+    """Remove a commodity requirement from a construction site."""
+    db_path = get_db_path(f"{construction_site}.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM deliveries WHERE commodity = ?", (commodity,))
+    conn.commit()
+    conn.close()
