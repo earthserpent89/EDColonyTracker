@@ -14,9 +14,14 @@ from database import (fetch_construction_sites, add_construction_site,
                      remove_construction_site, fetch_items, fetch_deliveries,
                      add_commodity_requirement, update_commodity_requirements,
                      remove_commodity_requirement)
+from utils import get_logger
+
+# Get a logger for this module
+logger = get_logger('SiteManager')
 
 def open_construction_site_manager(parent, update_callback=None):
     """Open the construction site management window."""
+    logger.info("Opening construction site manager window")
     manager_window = tk.Toplevel(parent)
     manager_window.title("Manage Construction Sites")
     manager_window.geometry("650x500")
@@ -42,7 +47,9 @@ def open_construction_site_manager(parent, update_callback=None):
     scrollbar.config(command=construction_site_listbox.yview)
 
     # Populate with existing sites
-    for site in fetch_construction_sites():
+    sites = fetch_construction_sites()
+    logger.debug(f"Loaded {len(sites)} construction sites")
+    for site in sites:
         construction_site_listbox.insert(tk.END, site)
 
     # Site entry and buttons frame
@@ -56,9 +63,11 @@ def open_construction_site_manager(parent, update_callback=None):
     def add_site():
         new_site = new_site_var.get()
         if not new_site:
+            logger.warning("Attempted to add site with empty name")
             messagebox.showwarning("Input Required", "Please enter a site name")
             return
             
+        logger.info(f"Adding new construction site: {new_site}")
         add_construction_site(new_site)
         construction_site_listbox.insert(tk.END, new_site)
         new_site_var.set("")
@@ -68,16 +77,20 @@ def open_construction_site_manager(parent, update_callback=None):
     def remove_site():
         selected_site = construction_site_listbox.get(tk.ACTIVE)
         if not selected_site:
+            logger.warning("Attempted to remove site without selecting one")
             messagebox.showwarning("Selection Required", "Please select a site to remove")
             return
             
         confirm = messagebox.askyesno("Confirm Deletion", 
                                       f"Are you sure you want to delete {selected_site}?\nThis will delete all delivery records for this site.")
         if confirm:
+            logger.info(f"Removing construction site: {selected_site}")
             remove_construction_site(selected_site)
             construction_site_listbox.delete(tk.ACTIVE)
             if update_callback:
                 update_callback()
+        else:
+            logger.debug(f"Canceled removal of site: {selected_site}")
 
     buttons_frame = tk.Frame(left_frame)
     buttons_frame.pack(fill=tk.X, pady=5)
@@ -118,7 +131,9 @@ def open_construction_site_manager(parent, update_callback=None):
     
     commodity_var = tk.StringVar()
     commodity_dropdown = ttk.Combobox(add_commodity_frame, textvariable=commodity_var)
-    commodity_dropdown['values'] = fetch_items()
+    items = fetch_items()
+    logger.debug(f"Loaded {len(items)} items for commodity dropdown")
+    commodity_dropdown['values'] = items
     commodity_dropdown.grid(row=0, column=1, padx=5, sticky=tk.EW)
     
     # Enable autocomplete for commodity dropdown
@@ -132,6 +147,7 @@ def open_construction_site_manager(parent, update_callback=None):
                 if value.lower() in item.lower():
                     data.append(item)
             commodity_dropdown['values'] = data
+            logger.debug(f"Filtered commodity dropdown to {len(data)} items matching '{value}'")
 
     commodity_dropdown.bind('<KeyRelease>', on_commodity_entry)
     
@@ -147,6 +163,7 @@ def open_construction_site_manager(parent, update_callback=None):
     def add_commodity_requirement_to_tree():
         selected_site = construction_site_listbox.get(tk.ACTIVE)
         if not selected_site:
+            logger.warning("Attempted to add commodity without selecting a site")
             messagebox.showwarning("Selection Required", "Please select a construction site first")
             return
         
@@ -154,6 +171,7 @@ def open_construction_site_manager(parent, update_callback=None):
         amount = amount_var.get()
         
         if not commodity or not amount:
+            logger.warning("Attempted to add commodity with missing information")
             messagebox.showwarning("Input Required", "Please select a commodity and enter an amount")
             return
             
@@ -161,7 +179,8 @@ def open_construction_site_manager(parent, update_callback=None):
             amount = int(amount)
             if amount <= 0:
                 raise ValueError("Amount must be positive")
-        except ValueError:
+        except ValueError as e:
+            logger.warning(f"Invalid amount entered: {amount_var.get()}")
             messagebox.showerror("Invalid Input", "Please enter a positive number for the amount")
             return
         
@@ -175,9 +194,11 @@ def open_construction_site_manager(parent, update_callback=None):
         
         if existing_item_id:
             # Update existing item
+            logger.info(f"Updating commodity requirement: {commodity} to {amount} for {selected_site}")
             requirements_tree.item(existing_item_id, values=(commodity, amount))
         else:
             # Add new item
+            logger.info(f"Adding new commodity requirement: {commodity} ({amount}) for {selected_site}")
             requirements_tree.insert("", tk.END, values=(commodity, amount))
         
         # Clear the entry fields
@@ -187,14 +208,18 @@ def open_construction_site_manager(parent, update_callback=None):
     def remove_commodity_requirement_from_tree():
         selected_item = requirements_tree.selection()
         if not selected_item:
+            logger.warning("Attempted to remove commodity without selecting one")
             messagebox.showwarning("Selection Required", "Please select a commodity to remove")
             return
             
+        selected_values = requirements_tree.item(selected_item)['values']
+        logger.info(f"Removing commodity requirement: {selected_values[0]}")
         requirements_tree.delete(selected_item)
 
     def save_all_requirements():
         selected_site = construction_site_listbox.get(tk.ACTIVE)
         if not selected_site:
+            logger.warning("Attempted to save requirements without selecting a site")
             messagebox.showwarning("Selection Required", "Please select a construction site")
             return
             
@@ -206,15 +231,20 @@ def open_construction_site_manager(parent, update_callback=None):
             requirements.append((commodity, int(amount)))
             
         if not requirements:
+            logger.warning("Attempted to save empty requirements list")
             messagebox.showwarning("No Requirements", "Please add at least one commodity requirement")
             return
             
         # Save all requirements using the database function
-        update_commodity_requirements(selected_site, requirements)
-            
-        messagebox.showinfo("Success", f"Requirements saved for {selected_site}")
-        if update_callback:
-            update_callback()
+        logger.info(f"Saving {len(requirements)} commodity requirements for {selected_site}")
+        try:
+            update_commodity_requirements(selected_site, requirements)
+            messagebox.showinfo("Success", f"Requirements saved for {selected_site}")
+            if update_callback:
+                update_callback()
+        except Exception as e:
+            logger.error(f"Error saving requirements: {e}")
+            messagebox.showerror("Error", f"Failed to save requirements: {e}")
 
     # When a site is selected, load its requirements
     def on_site_select(event):
@@ -224,11 +254,18 @@ def open_construction_site_manager(parent, update_callback=None):
             requirements_tree.delete(*requirements_tree.get_children())
             
             # Load requirements for the selected site
-            deliveries = fetch_deliveries(selected_site)
-            for delivery in deliveries:
-                commodity, amount_required, _, _ = delivery
-                if amount_required > 0:  # Only show items with requirements
-                    requirements_tree.insert("", tk.END, values=(commodity, amount_required))
+            logger.debug(f"Loading requirements for site: {selected_site}")
+            try:
+                deliveries = fetch_deliveries(selected_site)
+                count = 0
+                for delivery in deliveries:
+                    commodity, amount_required, _, _ = delivery
+                    if amount_required > 0:  # Only show items with requirements
+                        requirements_tree.insert("", tk.END, values=(commodity, amount_required))
+                        count += 1
+                logger.debug(f"Loaded {count} requirements for {selected_site}")
+            except Exception as e:
+                logger.error(f"Error loading requirements for {selected_site}: {e}")
 
     construction_site_listbox.bind('<<ListboxSelect>>', on_site_select)
     
@@ -242,3 +279,5 @@ def open_construction_site_manager(parent, update_callback=None):
     # Save all button
     tk.Button(right_frame, text="Save All Requirements", command=save_all_requirements, 
              bg="#4CAF50", fg="white", font=("Arial", 10, "bold")).pack(fill=tk.X, pady=10)
+    
+    logger.debug("Construction site manager UI setup complete")

@@ -5,20 +5,13 @@ items, and construction sites.
 
 import sqlite3
 import os
-import logging
+from utils import get_logger, BASE_DIR
+
+# Get a logger for this module
+logger = get_logger('Database')
 
 # Define the database directory path
-DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "databases")
-
-# Set up logging
-log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "edcolonytracker.log")
-logging.basicConfig(
-    filename=log_file,
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
-logger = logging.getLogger('Database')
+DB_DIR = os.path.join(BASE_DIR, "databases")
 
 def ensure_db_directory_exists():
     """Ensure the database directory exists, creating it if necessary."""
@@ -95,6 +88,7 @@ def add_item(item_name):
 def add_construction_site(construction_site_name):
     """Add a new construction site to the construction sites table."""
     try:
+        # Add to main database
         db_path = get_db_path("cargo_tracker.db")
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
@@ -102,10 +96,27 @@ def add_construction_site(construction_site_name):
             if cursor.rowcount > 0:
                 logger.info(f"Added construction site: {construction_site_name}")
         
-        # Create a separate database for the construction site
-        create_tables(f"{construction_site_name}.db")
+        # Create a separate database for the construction site with required tables
+        site_db_path = get_db_path(f"{construction_site_name}.db")
+        with sqlite3.connect(site_db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Create deliveries table directly (not relying on create_tables)
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS deliveries (
+                    id INTEGER PRIMARY KEY,
+                    commodity TEXT,
+                    quantity INTEGER DEFAULT 0,
+                    construction_site TEXT,
+                    amount_required INTEGER DEFAULT 0
+                )
+            ''')
+            logger.info(f"Created deliveries table for {construction_site_name}")
+            
+        return True
     except sqlite3.Error as e:
         logger.error(f"Database error in add_construction_site: {e}")
+        return False
 
 def populate_items():
     """Populate the items table with a predefined list of commodities."""

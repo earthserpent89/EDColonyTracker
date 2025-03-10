@@ -15,6 +15,10 @@ from database import (fetch_items, fetch_construction_sites, fetch_deliveries,
                      add_delivery, clear_deliveries)
 from gui.site_manager import open_construction_site_manager
 from gui.delivery_ui import create_delivery_table
+from utils import get_logger
+
+# Get a logger for this module
+logger = get_logger('MainWindow')
 
 class MainWindow:
     def __init__(self, root):
@@ -29,6 +33,7 @@ class MainWindow:
         self.quantity_var = tk.StringVar()
         self.show_completed = False
         
+        logger.info("Initializing main application window")
         self._create_ui()
         
     def _create_ui(self):
@@ -40,6 +45,7 @@ class MainWindow:
         
         # Create the deliveries table
         self.deliveries_list = create_delivery_table(self.root)
+        logger.debug("UI components created successfully")
         
     def _create_input_frame(self):
         # Frame for the top row of inputs
@@ -142,6 +148,7 @@ class MainWindow:
         if not construction_site:
             return
 
+        logger.debug(f"Updating deliveries list for {construction_site}")
         self.deliveries_list.delete(*self.deliveries_list.get_children())
         for delivery in fetch_deliveries(construction_site):
             if not show_completed and delivery[2] <= 0:
@@ -163,15 +170,18 @@ class MainWindow:
         construction_site = self.construction_site_var.get()
 
         if not commodity or not quantity or not construction_site:
+            logger.warning("Attempted to add delivery with missing information")
             messagebox.showerror("Error", "All fields must be filled!")
             return
 
         try:
             quantity = int(quantity)  # Ensure quantity is a number
         except ValueError:
+            logger.warning(f"Invalid quantity: '{quantity}' is not a number")
             messagebox.showerror("Error", "Quantity must be a number!")
             return
 
+        logger.info(f"Adding delivery: {quantity} units of {commodity} to {construction_site}")
         add_delivery(construction_site, commodity, quantity)
 
         messagebox.showinfo("Success", f"Added {quantity} units of {commodity} to {construction_site}!")
@@ -181,18 +191,26 @@ class MainWindow:
         """Export deliveries to a CSV file."""
         file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
         if not file_path:
+            logger.debug("Export to CSV cancelled by user")
             return
 
+        logger.info(f"Exporting data to CSV: {file_path}")
         construction_sites = fetch_construction_sites()
-        with open(file_path, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Commodity", "Amount Required", "Remaining Amount", "Total Delivered", "Construction Site"])
-            for site in construction_sites:
-                for delivery in fetch_deliveries(site):
-                    remaining_amount = '✅' if delivery[2] <= 0 else delivery[2]
-                    writer.writerow((delivery[0], delivery[1], remaining_amount, delivery[3], site))
-
-        messagebox.showinfo("Success", f"Data exported to {file_path}")
+        try:
+            with open(file_path, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Commodity", "Amount Required", "Remaining Amount", "Total Delivered", "Construction Site"])
+                rows_written = 0
+                for site in construction_sites:
+                    for delivery in fetch_deliveries(site):
+                        remaining_amount = '✅' if delivery[2] <= 0 else delivery[2]
+                        writer.writerow((delivery[0], delivery[1], remaining_amount, delivery[3], site))
+                        rows_written += 1
+                logger.info(f"Successfully exported {rows_written} rows of data")
+            messagebox.showinfo("Success", f"Data exported to {file_path}")
+        except Exception as e:
+            logger.error(f"Error exporting to CSV: {e}")
+            messagebox.showerror("Error", f"Failed to export data: {e}")
         
     def import_from_csv(self):
         """Import deliveries from a CSV file."""
@@ -200,29 +218,39 @@ class MainWindow:
         
         file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if not file_path:
+            logger.debug("Import from CSV cancelled by user")
             return
 
-        with open(file_path, mode='r') as file:
-            reader = csv.reader(file)
-            next(reader)  # Skip header row
-            deliveries = [row for row in reader]
+        try:
+            logger.info(f"Importing data from CSV: {file_path}")
+            with open(file_path, mode='r') as file:
+                reader = csv.reader(file)
+                next(reader)  # Skip header row
+                deliveries = [row for row in reader]
 
-        import_from_csv_to_db(deliveries)
-        self.update_construction_site_dropdown()
-        self.update_deliveries_list()
-        messagebox.showinfo("Success", f"Data imported from {file_path}")
+            import_from_csv_to_db(deliveries)
+            self.update_construction_site_dropdown()
+            self.update_deliveries_list()
+            logger.info(f"Successfully imported {len(deliveries)} records from {file_path}")
+            messagebox.showinfo("Success", f"Data imported from {file_path}")
+        except Exception as e:
+            logger.error(f"Error importing from CSV: {e}")
+            messagebox.showerror("Error", f"Failed to import data: {e}")
         
     def open_site_manager(self):
         """Open the construction site manager."""
+        logger.debug("Opening construction site manager")
         open_construction_site_manager(self.root, self.update_construction_site_dropdown)
         
     def update_construction_site_dropdown(self):
         """Update the construction site dropdown with fresh data."""
+        logger.debug("Updating construction site dropdown")
         self.construction_site_dropdown['values'] = fetch_construction_sites()
         
     def toggle_completed(self):
         """Toggle the visibility of completed deliveries."""
         self.show_completed = not self.show_completed
+        logger.debug(f"Toggled completed deliveries visibility to: {self.show_completed}")
         self.update_deliveries_list()
         self.show_completed_button.config(text="Hide Completed" if self.show_completed else "Show Completed")
         
@@ -230,11 +258,15 @@ class MainWindow:
         """Clear all deliveries for the selected construction site."""
         construction_site = self.construction_site_var.get()
         if not construction_site:
+            logger.warning("Attempted to clear deliveries without selecting a construction site")
             return
 
         response = messagebox.askyesno("Clear Deliveries", 
                                       f"Are you sure you want to clear all deliveries for {construction_site}?")
         if response:
+            logger.info(f"Clearing all deliveries for {construction_site}")
             clear_deliveries(construction_site)
             self.update_deliveries_list()
             messagebox.showinfo("Success", f"All deliveries for {construction_site} have been cleared.")
+        else:
+            logger.debug("Clear operation cancelled by user")
